@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>>
+    <style>
+        /* Card Container */
+        .nft-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .nft-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+        }
+
+        .nft-image {
+            height: 250px;
+            width: 100%;
+            background: linear-gradient(45deg, #1e3a8a, #3b0764);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .nft-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .nft-content {
+            padding: 1.5rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .nft-content h3 {
+            font-size: 1.4rem;
+            margin-bottom: 0.8rem;
+            color: #f8f9fa;
+        }
+
+        .nft-content p {
+            color: #c7d2fe;
+            margin-bottom: 1.2rem;
+            line-height: 1.6;
+            flex: 1;
+        }
+
+        .nft-meta {
+            display: flex;
+            justify-content: space-between;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #a9d6e5;
+            font-size: 0.9rem;
+        }
+
+        .nft-actions {
+            margin-top: 1rem;
+            display: flex;
+            gap: 0.8rem;
+        }
+
+        .btn-list {
+            background: linear-gradient(135deg, #4cc9f0, #4361ee);
+            border: none;
+            flex: 1;
+        }
+
+        .btn-unlist {
+            background: linear-gradient(135deg, #f72585, #b5179e);
+            border: none;
+            flex: 1;
+        }
+
+        .btn-view {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(74, 144, 226, 0.5);
+            color: #fff;
+            flex: 1;
+        }
+
+        .btn-view:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .price-input {
+            background: rgba(10, 25, 47, 0.7);
+            color: #fff;
+            border: 2px solid rgba(74, 144, 226, 0.3);
+            border-radius: 8px;
+            padding: 8px 15px;
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+
+        /* No NFTs State */
+        .no-nfts {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 3rem;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .no-nfts i {
+            font-size: 4rem;
+            color: #4cc9f0;
+            margin-bottom: 1.5rem;
+        }
+
+        .no-nfts h3 {
+            margin-bottom: 1rem;
+        }
+
+        .Token {
+            font-size: 1.2rem;
+            background: rgba(209, 9, 9, 0.05);
+            color: #020202;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+            transition: transform 0.3s ease;
+
+            flex-direction: column;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem 0;
+            color: #a9d6e5;
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 2rem;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Animations */
+        @keyframes shine {
+            0% {
+                transform: rotate(45deg) translateX(-100%);
+            }
+
+            100% {
+                transform: rotate(45deg) translateX(100%);
+            }
+        }
+
+        h1,
+        h2 {
+            background: linear-gradient(to right, #4cc9f0, #4361ee, #3a0ca3);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        h2 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .section-title i {
+            font-size: 2rem;
+            color: #4cc9f0;
+        }
+
+        .nft-media-container {
+            height: 250px;
+            width: 100%;
+            background: linear-gradient(45deg, #1e3a8a, #3b0764);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .nft-media-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .nft-media-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #000;
+        }
+
+        .nft-media-container audio {
+            width: 80%;
+        }
+
+        .document-preview {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #4cc9f0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+
+        <div class="nft-card">
+            <!-- Media Display Section (Updated) -->
+            <div class="nft-media-container card-img-top">
+                {% if nft.file_type == 'video' %}
+                <video controls poster="{{ nft.thumbnail_url }}" class="w-100">
+                    <source src="{{ nft.main_url }}" type="video/mp4">
+                </video>
+                {% elif nft.file_type == 'audio' %}
+                <audio controls class="w-100">
+                    <source src="{{ nft.main_url }}" type="audio/mpeg">
+                    <img src="{{ nft.thumbnail_url }}" alt="Album cover" style="display:none;">
+                </audio>
+                {% elif nft.file_type == 'document' %}
+                <div class="document-preview text-center p-4">
+                    <i class="fas fa-file-pdf fa-3x mb-2"></i>
+                    <p class="mb-0">Document</p>
+                </div>
+                {% else %}
+                <img src="{{ nft.image }}" class="w-100" alt="{{ nft.name }}"
+                    onerror="this.src='https://placehold.co/400x400?text=Image+Not+Available'">
+                {% endif %}
+            </div>
+
+            <!-- Existing Content Section -->
+            <div class="nft-content">
+                <h5 class="card-title">{{ nft.name }}</h5>
+                <p class="card-text text-truncate">{{ nft.description }}</p>
+                {% if nft.price is defined %}
+                <p class="fw-bold">Price: {{ nft.price }} ETH</p>
+                {% endif %}
+            </div>
+
+            <!-- Footer with Listing Controls -->
+            <div class="card-footer bg-white">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <a href="/view_metadata?url={{ nft.metadata_url }}" target="_blank"
+                        class="btn btn-sm btn-outline-secondary">Metadata</a>
+                    {% if nft.token_id is defined %}
+                    {% endif %}
+                </div>
+                <div class="Token">Token: {{ nft.token_id }} </div>
+
+                {% if nft.is_listed %}
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="text-success fw-bold">{{ nft.price }} ETH</span>
+                    <button class="btn btn-sm btn-danger unlist-btn" data-id="{{ nft.token_id | int }}">
+                        <i class="fas fa-ban me-1"></i> Unlist
+                    </button>
+                </div>
+                {% else %}
+                <div class="input-group">
+                    <input type="number" class="form-control form-control-sm price-input" min="0.001" step="0.001"
+                        placeholder="Price" id="price-input-{{ nft.token_id }}">
+                    <button class="btn btn-sm btn-success list-btn" data-id="{{ nft.token_id | int }}">
+                        <i class="fas fa-tag me-1"></i> List
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
