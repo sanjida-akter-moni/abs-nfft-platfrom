@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - ABS NFT Marketplace</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.8.0/dist/web3.min.js"></script>
+    <style>
+        /* Reset & base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
+
+        a,
+        .wallet-address,
+        .balance-badge {
+            color: #4cc9f0 !important;
+        }
+
+        /* Navbar include will inherit dark theme */
+        /* Override Bootstrap container */
+        .container.py-5 {
+            backdrop-filter: blur(10px);
+            background: rgba(10, 25, 47, 0.75);
+            border-radius: 1rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            padding: 3rem !important;
+        }
+
+        h1,
+        h2,
+        h5 {
+            background: linear-gradient(to right, #4cc9f0, #4361ee, #3a0ca3);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: bold;
+        }
+
+        .fw-bold,
+        label.form-label {
+            color: #a9d6e5 !important;
+        }
+
+        /* Wallet & Balance */
+        .wallet-address {
+            font-family: monospace;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.3rem 0.5rem;
+            border-radius: 0.5rem;
+        }
+
+        .balance-badge {
+            background: rgba(74, 144, 226, 0.3) !important;
+        }
+
+        /* Create NFT button */
+        #toggle-form.btn-primary {
+            background: linear-gradient(135deg, #4cc9f0, #4361ee) !important;
+            border: none;
+            box-shadow: 0 5px 15px rgba(76, 201, 240, 0.4);
+            transition: transform 0.3s ease;
+        }
+
+        #toggle-form.btn-primary:hover {
+            transform: translateY(-3px);
+        }
+
+        /* Glassmorphic card */
+        #create-form.card,
+        .alert.alert-info {
+            background: rgba(255, 255, 255, 0.08) !important;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.15) !important;
+            border-radius: 1rem !important;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important;
+            transition: transform 0.3s ease;
+        }
+
+        #create-form.card:hover,
+        .alert.alert-info:hover {
+            transform: translateY(-5px);
+        }
+
+        /* Form inputs */
+        .form-control {
+            background: rgba(10, 25, 47, 0.7) !important;
+            border: 2px solid rgba(74, 144, 226, 0.3) !important;
+            color: #fff !important;
+            border-radius: 0.75rem !important;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #4cc9f0 !important;
+            box-shadow: 0 0 0 3px rgba(76, 201, 240, 0.2) !important;
+            background: rgba(10, 25, 47, 0.9) !important;
+        }
+
+        .form-text {
+            color: #a9d6e5 !important;
+        }
+
+        /* Transaction status */
+        .alert.alert-info {
+            border-left: 4px solid #4cc9f0 !important;
+        }
+
+        .alert.alert-info .spinner-border {
+            color: #4cc9f0 !important;
+        }
+
+        /* NFT grid */
+        .row>.col-md-4,
+        .row>.col-md-3 {
+            margin-bottom: 1.5rem;
+        }
+
+        /* Error styling */
+        .error-alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            max-width: 400px;
+            opacity: 0.95;
+        }
+
+        .error-alert .alert-danger {
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid rgba(255, 0, 0, 0.5);
+            color: #ffdddd;
+        }
+
+        /* Footer link color */
+        footer a {
+            color: #4cc9f0;
+        }
+
+        .file-type-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .file-type-btn {
+            flex: 1;
+            background: rgba(10, 25, 47, 0.7);
+            border: 2px solid rgba(74, 144, 226, 0.3);
+            border-radius: 0.75rem;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-type-btn.active {
+            border-color: #4cc9f0;
+            background: rgba(10, 25, 47, 0.9);
+        }
+
+        .file-type-btn i {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        /* Preview container */
+        .preview-container {
+            position: relative;
+            height: 200px;
+            margin: 15px 0;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #0a192f;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .preview-container img,
+        .preview-container video {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .preview-container audio {
+            width: 100%;
+        }
+
+        .preview-placeholder {
+            color: #4cc9f0;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    {% include 'components/navbar.html' %}
+
+    <!-- Error display container -->
+    <div id="error-container" class="error-alert"></div>
+
+    <div class="container py-5">
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <h1>My Profile</h1>
+                <div class="d-flex align-items-center mb-3">
+                    <span class="fw-bold me-2">Wallet:</span>
+                    <span class="wallet-address">{{ user_address }}</span>
+                </div>
+                <div class="d-flex align-items-center">
+                    <span class="fw-bold me-2">Balance:</span>
+                    <span class="balance-badge bg-primary text-white px-3 py-1 rounded">
+                        {{ balance }} ETH
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <button id="toggle-form" class="btn btn-primary btn-lg">
+                    <i class="fas fa-plus me-2"></i>Create NFT
+                </button>
+            </div>
+        </div>
+
+        <!-- NFT Creation Form -->
+        <div id="create-form" class="card mb-5" style="display: none;">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Create New NFT</h5>
+            </div>
+            <div class="card-body">
+                <form id="nft-form" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label class="form-label">NFT Name</label>
+                        <input type="text" name="name" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea name="description" class="form-control" rows="3" required></textarea>
+                    </div>
+
+                    <!-- File Type Selection -->
+                    <div class="mb-3">
+                        <label class="form-label">File Type</label>
+                        <div class="file-type-container">
+                            <div class="file-type-btn active" data-type="image">
+                                <i class="fas fa-image"></i>
+                                <div>Image</div>
+                            </div>
+                            <div class="file-type-btn" data-type="video">
+                                <i class="fas fa-video"></i>
+                                <div>Video</div>
+                            </div>
+                            <div class="file-type-btn" data-type="audio">
+                                <i class="fas fa-music"></i>
+                                <div>Audio</div>
+                            </div>
+                            <div class="file-type-btn" data-type="document">
+                                <i class="fas fa-file"></i>
+                                <div>Document</div>
+                            </div>
+                        </div>
+                        <input type="hidden" name="file_type" id="file-type" value="image">
+                    </div>
+
+                    <!-- File Upload -->
+                    <div class="mb-3">
+                        <label class="form-label" id="file-label">Image</label>
+                        <input type="file" name="file" class="form-control" id="main-file" required>
+                        <div class="form-text">Max 100MB (All file types supported)</div>
+                    </div>
+
+                    <!-- Thumbnail Upload (Conditional) -->
+                    <div class="mb-3" id="thumbnail-section" style="display:none;">
+                        <label class="form-label">Thumbnail Image</label>
+                        <input type="file" name="thumbnail" class="form-control" accept="image/*">
+                        <div class="form-text">Required for video/audio files</div>
+                    </div>
+
+                    <!-- Preview Container -->
+                    <div class="preview-container">
+                        <div class="preview-placeholder">
+                            <i class="fas fa-cloud-upload-alt fa-3x"></i>
+                            <p>File preview will appear here</p>
+                        </div>
+                    </div>
+
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-primary">
+                            <span class="spinner-border spinner-border-sm d-none" id="create-spinner"></span>
+                            Create NFT
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Transaction Status Display -->
+        <div id="tx-status" class="alert alert-info d-none mb-4">
+            <div class="d-flex align-items-center">
+                <div class="spinner-border spinner-border-sm me-3" role="status"></div>
+                <div>
+                    <strong>Processing Transaction:</strong>
+                    <div class="tx-link" id="tx-hash"></div>
+                    <div class="mt-1">Confirmations: <span id="tx-attempt">0</span>/30</div>
+                </div>
+            </div>
+        </div>
+
+        <h2 class="mb-4">My NFTs</h2>
+        {% if nfts %}
+        <div class="row">
+            {% for nft in nfts %}
+            {% include 'components/nft_card.html' %}
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-box-open fa-3x mb-3"></i>
+            <h3>No NFTs Yet</h3>
+            <p class="text-muted">Create your first NFT to get started!</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Initialize Web3
+        const w3 = new Web3(window.ethereum);
+        const EXPLORER_URL = "https://sepolia.explorer.zksync.io/tx/";
+        const ZKSYNC_CHAIN_ID = '0x12c'; // 300 in hex
+        const CONTRACT_ADDRESS = '{{ contract_address }}';
+
+        // Utility function to show errors
+        function showError(message) {
+            const container = document.getElementById('error-container');
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+            alertDiv.role = 'alert';
+            alertDiv.innerHTML = `
+                <strong>Error!</strong> ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+            container.appendChild(alertDiv);
+
+            // Auto-remove after 10 seconds
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 10000);
+        }
+
+        // Transaction normalization helper
+        function normalizeTx(tx) {
+            const out = { ...tx };
+            const fields = ['chainId', 'gas', 'gasPrice', 'nonce', 'value'];
+
+            fields.forEach(field => {
+                if (out[field] !== undefined) {
+                    // Convert to hex string (handles both numbers and bigints)
+                    try {
+                        // Handle different value types
+                        const value = out[field];
+                        if (typeof value === 'number' || typeof value === 'bigint') {
+                            out[field] = '0x' + BigInt(value).toString(16);
+                        } else if (typeof value === 'string') {
+                            // Handle hex strings that might be missing 0x prefix
+                            if (!value.startsWith('0x')) {
+                                out[field] = '0x' + value;
+                            }
+                        }
+                    } catch (e) {
+                        console.warn(`Error normalizing field ${field}:`, e);
+                    }
+                }
+            });
+            return out;
+        }
+
+        // Toggle NFT creation form
+        document.getElementById('toggle-form').addEventListener('click', () => {
+            const form = document.getElementById('create-form');
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        });
+
+        // Network check function
+        async function checkNetwork() {
+            try {
+                const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+                if (chainId !== ZKSYNC_CHAIN_ID) {
+                    try {
+                        await window.ethereum.request({
+                            method: 'wallet_switchEthereumChain',
+                            params: [{ chainId: ZKSYNC_CHAIN_ID }]
+                        });
+
+                        // Verify switch
+                        const newChainId = await window.ethereum.request({ method: 'eth_chainId' });
+                        if (newChainId !== ZKSYNC_CHAIN_ID) {
+                            throw new Error('Failed to switch to zkSync Sepolia');
+                        }
+                        return true;
+                    } catch (switchError) {
+                        // Chain not added to wallet
+                        if (switchError.code === 4902) {
+                            await window.ethereum.request({
+                                method: 'wallet_addEthereumChain',
+                                params: [{
+                                    chainId: ZKSYNC_CHAIN_ID,
+                                    chainName: 'zkSync Sepolia Testnet',
+                                    nativeCurrency: {
+                                        name: 'Ether',
+                                        symbol: 'ETH',
+                                        decimals: 18
+                                    },
+                                    rpcUrls: ['https://sepolia.era.zksync.dev'],
+                                    blockExplorerUrls: ['https://sepolia.explorer.zksync.io/']
+                                }]
+                            });
+                            return true;
+                        }
+                        throw switchError;
+                    }
+                }
+                return true;
+            } catch (error) {
+                const message = error.message || error.toString();
+                showError('Network error: ' + message);
+                throw error;
+            }
+        }
+
+        // Gas estimation helper
+        async function estimateGas(txData) {
+            try {
+                const gasEstimate = await ethereum.request({
+                    method: 'eth_estimateGas',
+                    params: [txData]
+                });
+                return Math.min(Math.floor(gasEstimate * 1.2), 2000000); // 20% buffer
+            } catch (error) {
+                console.warn('Gas estimation failed, using fallback:', error);
+                return 500000; // Fallback gas limit
+            }
+        }
+
+        // Transaction confirmation helper
+        async function waitForTransaction(txHash) {
+            // Ensure we have a string value
+            const txHashStr = String(txHash);
+
+            const statusEl = document.getElementById('tx-status');
+            const hashEl = document.getElementById('tx-hash');
+            const attemptEl = document.getElementById('tx-attempt');
+
+            // Show status UI
+            statusEl.classList.remove('d-none');
+            const displayHash = txHashStr.length > 10 ?
+                txHashStr.substring(0, 6) + '...' + txHashStr.substring(txHashStr.length - 4) :
+                txHashStr;
+            hashEl.innerHTML = `<a href="${EXPLORER_URL}${txHashStr}" target="_blank">${displayHash}</a>`;
+
+            const maxAttempts = 30;
+            for (let i = 1; i <= maxAttempts; i++) {
+                attemptEl.textContent = i;
+                try {
+                    const receipt = await ethereum.request({
+                        method: 'eth_getTransactionReceipt',
+                        params: [txHashStr]
+                    });
+                    if (receipt) {
+                        statusEl.classList.add('d-none');
+                        return receipt;
+                    }
+                } catch (e) {
+                    console.warn(`Receipt check attempt ${i} failed:`, e);
+                }
+                await new Promise(resolve => setTimeout(resolve, 2000));
+            }
+
+            statusEl.classList.add('d-none');
+            throw new Error('Transaction confirmation timeout after 60 seconds');
+        }
+
+        // Handle form submission
+        document.getElementById('nft-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const form = e.target;
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const spinner = document.getElementById('create-spinner');
+
+            submitBtn.disabled = true;
+            spinner.classList.remove('d-none');
+
+            try {
+                // Ensure we're on the correct network
+                await checkNetwork();
+
+                // Get file type and validate thumbnail
+                const fileType = document.getElementById('file-type').value;
+                const thumbnailSection = document.getElementById('thumbnail-section');
+
+                if ((fileType === 'video' || fileType === 'audio') &&
+                    thumbnailSection.style.display === 'block' &&
+                    !document.querySelector('input[name="thumbnail"]').files[0]) {
+                    throw new Error('Thumbnail is required for video and audio files');
+                }
+
+                // Step 1: Create NFT metadata
+                const formData = new FormData(form);
+                const createResponse = await fetch('/create', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!createResponse.ok) {
+                    throw new Error('NFT metadata creation failed: ' + createResponse.status);
+                }
+
+                const createResult = await createResponse.json();
+                if (!createResult.success) {
+                    throw new Error(createResult.error || 'NFT metadata creation failed');
+                }
+
+                // Step 2: Prepare minting transaction
+                const mintResponse = await fetch('/mint', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token_uri: createResult.token_uri })
+                });
+
+                if (!mintResponse.ok) {
+                    throw new Error('Mint preparation failed: ' + mintResponse.status);
+                }
+
+                const mintResult = await mintResponse.json();
+                if (!mintResult.success) {
+                    throw new Error(mintResult.error || 'Mint transaction preparation failed');
+                }
+
+                // Step 3: Estimate and set gas
+                mintResult.tx.gas = await estimateGas(mintResult.tx);
+
+                // Step 3.5: Normalize transaction for MetaMask
+                const normalizedTx = normalizeTx(mintResult.tx);
+
+                // Step 4: Sign and send transaction
+                const txHash = await window.ethereum.request({
+                    method: 'eth_sendTransaction',
+                    params: [normalizedTx]
+                }).catch(error => {
+                    // Handle error objects and strings consistently
+                    const errMsg = (error && error.message) ? error.message : String(error);
+                    throw new Error(`Transaction submission failed: ${errMsg}`);
+                });
+
+                // Step 5: Wait for confirmation
+                const receipt = await waitForTransaction(txHash);
+                if (receipt.status) {
+                    alert(`🎉 NFT minted successfully!\n\nView transaction: ${EXPLORER_URL}${txHash}`);
+                    form.reset();
+                    document.getElementById('create-form').style.display = 'none';
+                    // Reset preview
+                    document.querySelector('.preview-container').innerHTML = `
+                        <div class="preview-placeholder">
+                            <i class="fas fa-cloud-upload-alt fa-3x"></i>
+                            <p>File preview will appear here</p>
+                        </div>
+                    `;
+                    // Refresh the page to show new NFT
+                    location.reload();
+                } else {
+                    throw new Error('Transaction failed on blockchain');
+                }
+
+            } catch (error) {
+                console.error('NFT creation error:', error);
+                showError(error.message || 'NFT creation failed');
+            } finally {
+                submitBtn.disabled = false;
+                spinner.classList.add('d-none');
+            }
+        });
+
+        // Handle list button clicks
+        document.addEventListener('click', async (e) => {
+            if (e.target.classList.contains('list-btn')) {
+                const tokenId = parseInt(e.target.dataset.id);
+                const priceInput = document.getElementById(`price-input-${tokenId}`);
+                const price = parseFloat(priceInput.value);
+
+                if (isNaN(price) || price <= 0) {
+                    showError('Please enter a valid price (minimum 0.001 ETH)');
+                    return;
+                }
+
+                try {
+                    await checkNetwork();
+
+                    const listResponse = await fetch('/list', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ token_id: tokenId, price: price })
+                    });
+
+                    if (!listResponse.ok) {
+                        throw new Error('Listing request failed: ' + listResponse.status);
+                    }
+
+                    const listResult = await listResponse.json();
+                    if (!listResult.success) {
+                        throw new Error(listResult.error || 'Listing failed');
+                    }
+
+                    // Estimate gas
+                    listResult.tx.gas = await estimateGas(listResult.tx);
+
+                    // Normalize transaction
+                    const normalizedTx = normalizeTx(listResult.tx);
+
+                    // Sign and send transaction
+                    const txHash = await window.ethereum.request({
+                        method: 'eth_sendTransaction',
+                        params: [normalizedTx]
+                    }).catch(error => {
+                        // Handle error objects and strings consistently
+                        const errMsg = (error && error.message) ? error.message : String(error);
+                        throw new Error(`Transaction submission failed: ${errMsg}`);
+                    });
+
+                    // Wait for confirmation
+                    const receipt = await waitForTransaction(txHash);
+                    if (receipt.status) {
+                        alert('NFT listed successfully!');
+                        location.reload();
+                    } else {
+                        throw new Error('Transaction failed on blockchain');
+                    }
+                } catch (error) {
+                    console.error('Listing error:', error);
+                    showError(error.message || 'Listing failed');
+                }
+            }
+
+            // Handle unlist button clicks
+            if (e.target.classList.contains('unlist-btn')) {
+                const tokenId = parseInt(e.target.dataset.id);
+
+                if (!confirm(`Are you sure you want to unlist NFT #${tokenId}?`)) {
+                    return;
+                }
+
+                try {
+                    await checkNetwork();
+
+                    const unlistResponse = await fetch('/unlist', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ token_id: tokenId })
+                    });
+
+                    if (!unlistResponse.ok) {
+                        throw new Error('Unlist request failed: ' + unlistResponse.status);
+                    }
+
+                    const unlistResult = await unlistResponse.json();
+                    if (!unlistResult.success) {
+                        throw new Error(unlistResult.error || 'Unlisting failed');
+                    }
+
+                    // Estimate gas
+                    unlistResult.tx.gas = await estimateGas(unlistResult.tx);
+
+                    // Normalize transaction
+                    const normalizedTx = normalizeTx(unlistResult.tx);
+
+                    // Sign and send transaction
+                    const txHash = await window.ethereum.request({
+                        method: 'eth_sendTransaction',
+                        params: [normalizedTx]
+                    }).catch(error => {
+                        // Handle error objects and strings consistently
+                        const errMsg = (error && error.message) ? error.message : String(error);
+                        throw new Error(`Transaction submission failed: ${errMsg}`);
+                    });
+
+                    // Wait for confirmation
+                    const receipt = await waitForTransaction(txHash);
+                    if (receipt.status) {
+                        alert('NFT unlisted successfully!');
+                        location.reload();
+                    } else {
+                        throw new Error('Transaction failed on blockchain');
+                    }
+                } catch (error) {
+                    console.error('Unlist error:', error);
+                    showError(error.message || 'Unlisting failed');
+                }
+            }
+        });
+
+        // File Type Selection
+        document.querySelectorAll('.file-type-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.file-type-btn').forEach(b => {
+                    b.classList.remove('active');
+                });
+                btn.classList.add('active');
+
+                const fileType = btn.dataset.type;
+                document.getElementById('file-type').value = fileType;
+
+                // Update label
+                const labels = {
+                    'image': 'Image',
+                    'video': 'Video',
+                    'audio': 'Audio',
+                    'document': 'Document'
+                };
+                document.getElementById('file-label').textContent = labels[fileType];
+
+                // Show/hide thumbnail section
+                const thumbnailSection = document.getElementById('thumbnail-section');
+                thumbnailSection.style.display =
+                    (fileType === 'video' || fileType === 'audio') ? 'block' : 'none';
+
+                // Reset file input
+                document.getElementById('main-file').value = '';
+
+                // Reset preview
+                document.querySelector('.preview-container').innerHTML = `
+                    <div class="preview-placeholder">
+                        <i class="fas fa-cloud-upload-alt fa-3x"></i>
+                        <p>File preview will appear here</p>
+                    </div>
+                `;
+            });
+        });
+
+        // File Preview
+        document.getElementById('main-file').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // Validate file size (100MB)
+            if (file.size > 100 * 1024 * 1024) {
+                showError('File size exceeds 100MB limit');
+                e.target.value = '';
+                return;
+            }
+
+            const previewContainer = document.querySelector('.preview-container');
+            previewContainer.innerHTML = '';
+
+            const fileType = document.getElementById('file-type').value;
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                let previewElement;
+
+                switch (fileType) {
+                    case 'image':
+                        previewElement = document.createElement('img');
+                        previewElement.src = e.target.result;
+                        break;
+                    case 'video':
+                        previewElement = document.createElement('video');
+                        previewElement.src = e.target.result;
+                        previewElement.controls = true;
+                        previewElement.autoplay = true;
+                        previewElement.muted = true;
+                        previewElement.style.maxHeight = '100%';
+                        break;
+                    case 'audio':
+                        previewElement = document.createElement('audio');
+                        previewElement.src = e.target.result;
+                        previewElement.controls = true;
+                        break;
+                    case 'document':
+                        previewElement = document.createElement('div');
+                        previewElement.className = 'preview-placeholder';
+                        previewElement.innerHTML = `
+                            <i class="fas fa-file fa-3x"></i>
+                            <p>${file.name}</p>
+                            <small>${(file.size / 1024 / 1024).toFixed(2)} MB</small>
+                        `;
+                        break;
+                }
+
+                if (previewElement) {
+                    previewContainer.appendChild(previewElement);
+                }
+            };
+
+            if (fileType === 'document') {
+                previewContainer.innerHTML = `
+                    <div class="preview-placeholder">
+                        <i class="fas fa-file fa-3x"></i>
+                        <p>${file.name}</p>
+                        <small>${(file.size / 1024 / 1024).toFixed(2)} MB</small>
+                    </div>
+                `;
+            } else {
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Handle URL hash for form visibility
+        if (window.location.hash === '#create') {
+            document.getElementById('create-form').style.display = 'block';
+        }
+
+        // Initialize file type buttons
+        document.querySelector('.file-type-btn[data-type="image"]').click();
+    </script>
+</body>
+
+</html>
